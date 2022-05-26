@@ -4,8 +4,10 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "ts-node-dev -r tsconfig-paths/register src/index.ts",
-    "test": "jest"
+    "start": "ts-node -r tsconfig-paths/register src/index.ts",
+    "dev:start": "ts-node-dev -r tsconfig-paths/register src/index.ts",
+    "test": "jest --watchAll --no-cache",
+    "test:ci": "jest"
   },
   "keywords": [],
   "author": "",
