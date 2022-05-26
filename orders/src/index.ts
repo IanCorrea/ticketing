@@ -10,6 +10,7 @@ import { PaymentCreatedListener } from '@providers/StreamingProvider/implementat
 import app from './app';
 
 const start = async () => {
+  console.log('Starting...');
   if (!natsConfig.nats.clientId) {
     throw new Error('NATS_CLIENT_ID must be defined');
   }
