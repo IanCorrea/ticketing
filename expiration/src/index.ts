@@ -4,6 +4,7 @@ import NatsProvider from '@providers/StreamingProvider/implementations/NatsProvi
 import { OrderCreatedListener } from '@providers/StreamingProvider/implementations/listeners/OrderCreatedListener';
 
 const start = async () => {
+  console.log('Starting...');
   if (!natsConfig.nats.clientId) {
     throw new Error('NATS_CLIENT_ID must be defined');
   }
