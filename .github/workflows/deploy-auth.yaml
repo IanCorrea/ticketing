@@ -19,8 +19,8 @@ jobs:
       - run: |
           cd auth &&
           touch .env
-          echo APP_SECRET=${{ secrets.APP_SECRET }} >> .env
-          echo MONGO_URI=${{ secrets.MONGO_URI }} >> .env
+          echo APP_SECRET=$APP_SECRET >> .env
+          echo MONGO_URI=$MONGO_URI >> .env
           cat .env
         env: 
           APP_SECRET: ${{ secrets.APP_SECRET }} 
