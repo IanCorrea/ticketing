@@ -28,7 +28,7 @@
     "mongoose-update-if-current": "^1.4.0",
     "node-nats-streaming": "^0.3.2",
     "stripe": "^9.2.0",
-    "ts-node-dev": "^1.1.8",
+    "ts-node-dev": "^2.0.0-0",
     "tsconfig-paths": "^4.0.0",
     "typescript": "^4.6.4"
   },
