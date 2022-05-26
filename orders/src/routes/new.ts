@@ -16,8 +16,6 @@ import NatsProvider from '@providers/StreamingProvider/implementations/NatsProvi
 
 const router = express.Router();
 
-const EXPIRATION_WINDOW_SECONDS = 1 * 60;
-
 router.post(
   '/',
   requireAuth,
@@ -44,9 +42,7 @@ router.post(
 
     const expiration = new Date();
     expiration.setSeconds(
-      expiration.getSeconds() +
-        (orderConfig.order.expirationWindowSeconds ||
-          EXPIRATION_WINDOW_SECONDS),
+      expiration.getSeconds() + orderConfig.order.expirationWindowSeconds,
     );
 
     const order = Order.build({
