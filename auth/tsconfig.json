@@ -8,7 +8,7 @@
     "paths": {
       "@config/*": ["config/*"],
       "@services/*": ["services/*"],
-      "@models/*": ["models/*"],
+      "@models/*": ["models/*"]
     },
     "typeRoots": [
       "./src/@types",
