@@ -30,7 +30,7 @@ jobs:
           MONGO_URI: ${{ secrets.ORDERS_MONGO_URI }}
           NATS_URL: ${{ secrets.NATS_URL }}
           NATS_CLUSTER_ID: ${{ secrets.NATS_CLUSTER_ID }}
-          EXPIRATION_WINDOW_SECONDS: 1
+          EXPIRATION_WINDOW_SECONDS: ${{ secrets.EXPIRATION_WINDOW_SECONDS }}
       - run: cd orders && docker build -t iancorrea/orders .
       - run: docker push iancorrea/orders
       - uses: digitalocean/action-doctl@v2

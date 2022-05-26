@@ -16,7 +16,6 @@ const start = async () => {
   }
 
   try {
-    console.log('Starting....');
     await NatsProvider.connect(
       natsConfig.nats.clusterId,
       natsConfig.nats.clientId,
