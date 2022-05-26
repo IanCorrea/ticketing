@@ -1,0 +1,38 @@
+name: deploy-expiration
+
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - 'expiration/**'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - run: docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
+        env:
+          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+      - run: |
+          cd expiration &&
+          touch .env
+          echo APP_SECRET=$APP_SECRET >> .env
+          echo NATS_URL=$NATS_URL >> .env
+          echo NATS_CLUSTER_ID=$NATS_CLUSTER_ID >> .env
+          echo REDIS_HOST=$REDIS_HOST >> .env
+          cat .env
+        env: 
+          APP_SECRET: ${{ secrets.APP_SECRET }} 
+          NATS_URL: ${{ secrets.NATS_URL }} 
+          NATS_CLUSTER_ID: ${{ secrets.NATS_CLUSTER_ID }} 
+          REDIS_HOST: ${{ secrets.EXPIRATION_REDIS_HOST }} 
+      - run: cd expiration && docker build -t iancorrea/expiration .
+      - run: docker push iancorrea/expiration
+      - uses: digitalocean/action-doctl@v2
+        with:
+          token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
+      - run: doctl kubernetes cluster kubeconfig save ticketing
+      - run: kubectl rollout restart deployment expiration-depl

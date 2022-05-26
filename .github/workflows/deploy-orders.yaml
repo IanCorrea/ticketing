@@ -1,0 +1,40 @@
+name: deploy-orders
+
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - 'orders/**'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - run: docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
+        env:
+          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+      - run: |
+          cd orders &&
+          touch .env
+          echo APP_SECRET=$APP_SECRET >> .env
+          echo MONGO_URI=$MONGO_URI >> .env
+          echo NATS_URL=$NATS_URL >> .env
+          echo NATS_CLUSTER_ID=$NATS_CLUSTER_ID >> .env
+          echo EXPIRATION_WINDOW_SECONDS=$EXPIRATION_WINDOW_SECONDS >> .env
+          cat .env
+        env: 
+          APP_SECRET: ${{ secrets.APP_SECRET }} 
+          MONGO_URI: ${{ secrets.ORDERS_MONGO_URI }}
+          NATS_URL: ${{ secrets.NATS_URL }}
+          NATS_CLUSTER_ID: ${{ secrets.NATS_CLUSTER_ID }}
+          EXPIRATION_WINDOW_SECONDS: 1
+      - run: cd orders && docker build -t iancorrea/orders .
+      - run: docker push iancorrea/orders
+      - uses: digitalocean/action-doctl@v2
+        with:
+          token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
+      - run: doctl kubernetes cluster kubeconfig save ticketing
+      - run: kubectl rollout restart deployment orders-depl

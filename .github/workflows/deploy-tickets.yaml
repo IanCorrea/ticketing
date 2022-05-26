@@ -1,0 +1,38 @@
+name: deploy-tickets
+
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - 'tickets/**'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - run: docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
+        env:
+          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+      - run: |
+          cd tickets &&
+          touch .env
+          echo APP_SECRET=$APP_SECRET >> .env
+          echo MONGO_URI=$MONGO_URI >> .env
+          echo NATS_URL=$NATS_URL >> .env
+          echo NATS_CLUSTER_ID=$NATS_CLUSTER_ID >> .env
+          cat .env
+        env: 
+          APP_SECRET: ${{ secrets.APP_SECRET }} 
+          MONGO_URI: ${{ secrets.TICKETS_MONGO_URI }} 
+          NATS_URL: ${{ secrets.NATS_URL }}
+          NATS_CLUSTER_ID: ${{ secrets.NATS_CLUSTER_ID }}
+      - run: cd tickets && docker build -t iancorrea/tickets .
+      - run: docker push iancorrea/tickets
+      - uses: digitalocean/action-doctl@v2
+        with:
+          token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
+      - run: doctl kubernetes cluster kubeconfig save ticketing
+      - run: kubectl rollout restart deployment tickets-depl
