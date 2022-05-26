@@ -17,6 +17,7 @@ jobs:
           DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
           DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
       - run: |
+          cd auth &&
           touch .env
           echo APP_SECRET=${{ secrets.APP_SECRET }} >> .env
           echo MONGO_URI=${{ secrets.MONGO_URI }} >> .env
