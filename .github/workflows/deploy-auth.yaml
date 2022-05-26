@@ -1,0 +1,33 @@
+name: deploy-auth
+
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - 'auth/**'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - run: docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD
+        env:
+          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+      - run: |
+          touch .env
+          echo APP_SECRET=${APP_SECRET} > .env
+          echo MONGO_URI=${MONGO_URI} > .env
+          cat .env
+        env: 
+          APP_SECRET: ${{ secrets.APP_SECRET }} 
+          MONGO_URI: ${{ secrets.AUTH_MONGO_URI }} 
+      - run: cd auth && docker build -t iancorrea/auth .
+      - run: docker push iancorrea/auth
+      - uses: digitalocean/action-doctl@v2
+        with:
+          token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
+      - run: doctl kubernetes cluster kubeconfig save ticketing
+      - run: kubectl rollout restart deployment auth-depl
